@@ -11,7 +11,7 @@ const head = (title, sub = '') => `<div class="section"><h1>${title}</h1>${sub ?
 
 // light / dark, as on netnetintel.com (dark by default)
 const $theme = document.getElementById('theme');
-const setTheme = (t) => { document.documentElement.classList.toggle('light', t === 'light'); $theme.textContent = t === 'light' ? 'Dark' : 'Light'; try { localStorage.setItem('netnet-theme', t); } catch (e) {} };
+const setTheme = (t) => { document.documentElement.classList.toggle('light', t === 'light'); $theme.querySelector('.tlabel').textContent = t === 'light' ? 'Dark' : 'Light'; try { localStorage.setItem('netnet-theme', t); } catch (e) {} };
 setTheme((() => { try { return localStorage.getItem('netnet-theme') === 'light' ? 'light' : 'dark'; } catch (e) { return 'dark'; } })());
 $theme.onclick = () => setTheme(document.documentElement.classList.contains('light') ? 'dark' : 'light');
 
@@ -30,6 +30,13 @@ function render() {
   if (S.auth === 'login') return passwordScreen(false);
   const st = S.status, s = S.settings;
   const stopped = !!st?.ledger?.stop?.local || !!st?.relay?.control?.stop;
+  const fd = document.getElementById('fdot'), fs = document.getElementById('fstatus'), fv = document.getElementById('fver');
+  if (fv) fv.textContent = st?.v || '';
+  if (fd && fs) {
+    const lt = st?.ledger?.lastTick?.at, err = st?.error;
+    fd.className = 'dot ' + (err ? 'bad' : stopped ? 'warn' : lt ? 'ok' : '');
+    fs.textContent = err ? 'Check failed' : stopped ? 'Stopped' : st?.view?.block ? 'Block ' + Number(st.view.block).toLocaleString('en-US') : 'Starting';
+  }
   $pills.innerHTML = `<span class="pill ${s.mode === 'live' ? 'live' : 'paper'}">${s.mode === 'live' ? 'Live' : 'Paper'}</span><span class="pill ${stopped ? 'stop' : 'run'}">${stopped ? 'Stopped' : 'Running'}</span>`;
   if (view === 'settings') return settingsScreen();
   if (!S.wallet || !S.wallet.backedUp) return walletStep();

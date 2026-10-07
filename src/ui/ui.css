@@ -27,19 +27,24 @@ a{color:var(--fg);text-underline-offset:2px}
 
 /* header — the site's bar: mark, serif wordmark, small caps controls */
 .top{border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(8px);position:sticky;top:0;z-index:5}
-.top-in{max-width:1040px;margin:0 auto;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.top-in{max-width:1040px;margin:0 auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px}
 .mark{color:var(--brand)}
-.wordmark{font:22px/1 var(--display);letter-spacing:-.01em}.wordmark em{color:var(--brand)}
+.wordmark{font:18px/1.75 var(--display);letter-spacing:-.025em}.wordmark em{color:var(--brand)}
 .tag,.link,.pill,.eyebrow,.foot{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase}
 .tag{color:var(--muted);padding-left:10px;margin-left:2px;border-left:1px solid var(--line)}
 .top-right{display:flex;align-items:center;gap:10px}
-button.link{background:none;border:0;padding:4px 2px;color:var(--muted);font-weight:500;cursor:pointer}
-button.link:hover{color:var(--fg)}
+.themebtn{display:flex;align-items:center;gap:6px;background:none;border:0;padding:4px 0;color:var(--muted);font:500 10px var(--body);letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
+.themebtn:hover{color:var(--fg);border:0}.themebtn .moon,:root.light .themebtn .sun{display:none}.themebtn .sun,:root.light .themebtn .moon{display:inline-flex}
+/* footer — the main app's: status · NetNet Intel · version */
+.foot{max-width:992px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px;border-top:1px solid var(--line);padding:20px 0;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.foot a{color:var(--muted);text-decoration:none;display:flex;gap:6px;align-items:center}.foot a:hover{color:var(--fg)}
+.foot .plain{text-transform:none;letter-spacing:normal;color:var(--fg)}.foot .mono-plain{font-family:var(--mono);text-transform:none;letter-spacing:normal;color:var(--fg)}
+.status{display:flex;align-items:center;gap:6px}.status .dot{width:6px;height:6px;border-radius:50%;background:color-mix(in srgb,var(--muted) 50%,transparent)}
+.status .dot.ok{background:var(--brand)}.status .dot.warn{background:var(--warn)}.status .dot.bad{background:var(--bad)}
+.fine{max-width:992px;margin:0 auto;padding:0 0 28px;color:var(--muted);font-size:11px}
 
 main{max-width:1040px;margin:0 auto;padding:8px 24px 48px}
-.foot{max-width:992px;margin:0 auto;padding:18px 0 28px;border-top:1px solid var(--line);color:var(--muted);display:flex;gap:16px;justify-content:space-between;flex-wrap:wrap;letter-spacing:.14em;line-height:1.8}
-.live-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brand);margin-right:8px;vertical-align:1px}
 
 /* section header — SectionHeader.jsx: rule above, serif title, muted subtitle */
 .section{border-top:1px solid var(--line);padding-top:28px;margin:8px 0 22px}
@@ -96,5 +101,5 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .err{color:var(--bad);margin-top:8px;min-height:1em;font-size:13px}
 .pos{color:var(--brand)}.neg{color:var(--bad)}
 ol,ul{padding-left:20px}
-@media (max-width:1040px){.foot{margin:0 24px}}
-@media (max-width:560px){.top-in,main{padding-left:16px;padding-right:16px}.foot{margin:0 16px}.tag{display:none}h1{font-size:26px}.big{font-size:26px}}
+@media (max-width:1040px){.foot,.fine{margin:0 24px}}
+@media (max-width:560px){.top-in,main{padding-left:16px;padding-right:16px}.foot,.fine{margin:0 16px}.tag{display:none}h1{font-size:26px}.big{font-size:26px}}
