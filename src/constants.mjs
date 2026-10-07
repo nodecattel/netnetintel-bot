@@ -34,3 +34,9 @@ export const DEFAULT_CHECKS = {
 export const TICK_SECONDS = 120;   // how often the bot decides
 export const LOOP_SECONDS = 15;    // how often it wakes (relay polls are paced by the relay)
 export const GAS_FLOOR_ETH = 0.00006;   // three transactions' worth on Robinhood Chain
+
+// Attribution (ERC-8021, schema 0): the bot's desk transactions end with a short public tag naming NetNet Intel, so
+// the volume and fees self-run bots bring the protocol can be counted on chain. The desk ignores trailing bytes: the
+// fill is the same; it adds about 450 gas. Owners can turn it off (settings → attribution, or ATTRIBUTION=off).
+export const ATTRIBUTION_CODE = 'netnetintel_bot';
+export const ERC8021_MARKER = '80218021802180218021802180218021';

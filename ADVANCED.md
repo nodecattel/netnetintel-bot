@@ -22,6 +22,7 @@ Everything is set on the setup page. These environment variables override the pa
 | `RELAY_TOKEN` | the pairing code from /selfhost |
 | `RPC_URL` | your own Robinhood Chain RPC (https). Default: the public RPC |
 | `TICK_SECONDS` | how often the bot decides (minimum 60, default 120) |
+| `ATTRIBUTION=off` | don't add the `netnetintel_bot` ERC-8021 tag to the bot's desk transactions (on by default) |
 | `REQUIRE_HEALTH=false` | trade without the site's pre-trade checks (not recommended) |
 | `REQUIRE_RFV_MATCH=false` | skip the Treasury.rfv() cross-check (not recommended) |
 | `BOT_PRIVATE_KEY` or `BOT_PRIVATE_KEY_FILE` | use an existing key instead of a wallet made on the page. It's read from the environment or a Docker secret file and never written to disk. Use a wallet that holds only what the bot may risk |

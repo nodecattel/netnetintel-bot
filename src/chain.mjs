@@ -3,7 +3,7 @@
 // re-quoted by the desk right before signing and sent with a floor 1.5% under that quote, so a moved book reverts
 // instead of filling worse.
 import { decodeSeries, deriveSeries, minOut } from './vendor/strategy.mjs';
-import { CHAIN_ID, DESK, USDG, TREASURY, SEL, TRANSFER_TOPIC } from './constants.mjs';
+import { CHAIN_ID, DESK, USDG, TREASURY, SEL, TRANSFER_TOPIC, ERC8021_MARKER } from './constants.mjs';
 
 const w = (n) => BigInt(n).toString(16).padStart(64, '0');
 const addrWord = (a) => a.toLowerCase().replace(/^0x/, '').padStart(64, '0');
@@ -71,8 +71,29 @@ export async function quoteSellRaw(rpc, side, tokens) {
   const v = word0(r[0]?.result); if (!v) throw new Error('the desk gave no sell quote'); return v;
 }
 
-// The signer. ethers is loaded only here, only in live mode.
-export async function makeSigner(privateKey, rpcUrl) {
+// ERC-8021 schema-0 suffix: the codes (ASCII, comma-separated), their length (1 byte), the schema id 0x00, the marker.
+export function attributionSuffix(codes) {
+  const list = (Array.isArray(codes) ? codes : [codes]).filter(Boolean).join(',');
+  if (!list) return '';
+  if (!/^[\x21-\x7e]+$/.test(list) || list.length > 255) throw new Error('attribution codes must be printable ASCII, at most 255 bytes');
+  const hex = [...list].map((c) => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
+  return hex + list.length.toString(16).padStart(2, '0') + '00' + ERC8021_MARKER;
+}
+// the attribution codes at the end of calldata, or null
+export function readAttribution(data) {
+  const d = String(data || '').replace(/^0x/, '').toLowerCase();
+  if (!d.endsWith(ERC8021_MARKER) || d.length < 2 * 18) return null;
+  const end = d.length - ERC8021_MARKER.length;
+  if (d.slice(end - 2, end) !== '00') return null;                 // schema 0 only
+  const len = parseInt(d.slice(end - 4, end - 2), 16);
+  const start = end - 4 - len * 2;
+  if (start < 8) return null;
+  return d.slice(start, end - 4).match(/../g).map((b) => String.fromCharCode(parseInt(b, 16))).join('').split(',');
+}
+export const tagged = (data, suffix) => (suffix ? data + suffix : data);
+
+// The signer. ethers is loaded only here, only in live mode. tag: the attribution suffix for desk calls ('' for none).
+export async function makeSigner(privateKey, rpcUrl, { tag = '' } = {}) {
   const { Wallet, JsonRpcProvider } = await import('ethers');
   const provider = new JsonRpcProvider(rpcUrl, CHAIN_ID, { staticNetwork: true });
   const wallet = new Wallet(privateKey, provider);
@@ -86,22 +107,22 @@ export async function makeSigner(privateKey, rpcUrl) {
   const transfersTo = (rc, token) => (rc.logs || []).filter((l) => (!token || l.address?.toLowerCase() === token.toLowerCase()) &&
     l.topics?.[0]?.toLowerCase() === TRANSFER_TOPIC && l.topics?.[2]?.slice(-40).toLowerCase() === me.slice(2));
   return {
-    address: wallet.address,
+    address: wallet.address, tag,
     async approve(amountUsdg) { return send(USDG, SEL.approve + addrWord(DESK) + w(toRaw6(amountUsdg))); },
     async buy(side, usdg, quoteRaw, token) {
-      const rc = await send(DESK, SEL.buy + w(side === 'HIGHER' ? 1 : 0) + w(toRaw6(usdg)) + w(minOut(quoteRaw)));
+      const rc = await send(DESK, tagged(SEL.buy + w(side === 'HIGHER' ? 1 : 0) + w(toRaw6(usdg)) + w(minOut(quoteRaw)), tag));
       const t = transfersTo(rc, token)[0];
       if (!t) throw new Error('no outcome tokens arrived in ' + rc.hash);
       return { tokens: Number(BigInt(t.data)) / 1e18, tx: rc.hash };
     },
     async sell(side, tokens, quoteRaw) {
-      const rc = await send(DESK, SEL.sell + w(side === 'HIGHER' ? 1 : 0) + w(toRaw18(tokens)) + w(minOut(quoteRaw)));
+      const rc = await send(DESK, tagged(SEL.sell + w(side === 'HIGHER' ? 1 : 0) + w(toRaw18(tokens)) + w(minOut(quoteRaw)), tag));
       const t = transfersTo(rc, USDG)[0];
       if (!t) throw new Error('no USDG arrived in ' + rc.hash);
       return { proceeds: Number(BigInt(t.data)) / 1e6, tx: rc.hash };
     },
     async redeem(seriesId, side, tokens) {
-      const rc = await send(DESK, SEL.redeem + w(seriesId) + w(side === 'HIGHER' ? 1 : 0) + w(toRaw18(tokens)));
+      const rc = await send(DESK, tagged(SEL.redeem + w(seriesId) + w(side === 'HIGHER' ? 1 : 0) + w(toRaw18(tokens)), tag));
       const t = transfersTo(rc, USDG)[0];
       return { proceeds: t ? Number(BigInt(t.data)) / 1e6 : 0, tx: rc.hash };
     },

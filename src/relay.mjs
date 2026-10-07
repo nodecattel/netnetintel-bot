@@ -3,7 +3,7 @@
 // phrase, and the relay can never make it buy: its commands only stop, resume within the owner's local limits, or sell.
 import { RELAY_URL } from './constants.mjs';
 
-export const VERSION = '1.0.0';
+export const VERSION = '1.1.0';
 const MAX_QUEUE = 30;
 
 export function makeRelay({ token, url = RELAY_URL, fetchImpl = fetch, log = () => {} }) {

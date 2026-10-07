@@ -45,6 +45,7 @@ function applyEnv(store) {
   if (e.WITHDRAW_TO) s.withdrawTo = e.WITHDRAW_TO;
   if (e.RPC_URL) s.rpcUrl = e.RPC_URL;
   if (e.TICK_SECONDS) s.tickSeconds = Number(e.TICK_SECONDS);
+  if (e.ATTRIBUTION === 'off' || e.ATTRIBUTION === 'on') s.attribution = e.ATTRIBUTION === 'on';
   if (e.REQUIRE_HEALTH === 'false' || e.REQUIRE_RFV_MATCH === 'false') s.checks = { ...(s.checks || {}), ...(e.REQUIRE_HEALTH === 'false' ? { requireHealth: false } : {}), ...(e.REQUIRE_RFV_MATCH === 'false' ? { requireRfvMatch: false } : {}) };
   store.saveSettings(s);
 }

@@ -58,7 +58,7 @@ export function startServer({ store, bot, port = 8787, host = '0.0.0.0', allowed
       if (auth !== 'ok') return { auth };
       const s = store.settings() || {};
       const wl = walletOf(store);
-      return { auth, settings: { mode: s.mode || 'paper', limits: { ...s.limits }, effective: limitsOf(s), withdrawTo: s.withdrawTo || null, checks: s.checks || {}, paired: !!s.relayToken },
+      return { auth, settings: { mode: s.mode || 'paper', limits: { ...s.limits }, effective: limitsOf(s), withdrawTo: s.withdrawTo || null, checks: s.checks || {}, attribution: s.attribution !== false, paired: !!s.relayToken },
         wallet: wl ? { address: wl.address, backedUp: !!wl.backedUp, fromEnv: !!wl.fromEnv } : null, status: bot.status() };
     },
     'POST /api/password': async (_r, b) => {
@@ -93,6 +93,7 @@ export function startServer({ store, bot, port = 8787, host = '0.0.0.0', allowed
         s.withdrawTo = b.withdrawTo || null;
       }
       if (b.checks) s.checks = { requireHealth: b.checks.requireHealth !== false, requireRfvMatch: b.checks.requireRfvMatch !== false };
+      if (typeof b.attribution === 'boolean') s.attribution = b.attribution;
       if (b.rpcUrl !== undefined) { if (b.rpcUrl && !/^https:\/\//.test(b.rpcUrl)) throw httpErr(400, 'the RPC address must start with https://'); s.rpcUrl = b.rpcUrl || undefined; }
       store.saveSettings(s);
       return { ok: true };

@@ -1,8 +1,8 @@
 // One tick of the bot: read the chain and the signal, take the owner's commands, decide (engine.mjs), then sign and
 // record each action in order. Paper mode runs the same path with fills priced on the desk's curve and no signing.
 import { plan, reconcile, emptyLedger, openTranches, seriesBook, limitsOf, checksOf, money } from './engine.mjs';
-import { readView, quoteBuyRaw, quoteSellRaw, makeRpc, makeSigner } from './chain.mjs';
-import { SIGNAL_URL, PUBLIC_RPC, GAS_FLOOR_ETH } from './constants.mjs';
+import { readView, quoteBuyRaw, quoteSellRaw, makeRpc, makeSigner, attributionSuffix } from './chain.mjs';
+import { SIGNAL_URL, PUBLIC_RPC, GAS_FLOOR_ETH, ATTRIBUTION_CODE } from './constants.mjs';
 import { makeRelay, VERSION } from './relay.mjs';
 import { walletOf } from './wallet.mjs';
 
@@ -42,7 +42,8 @@ export function makeBot({ store, fetchImpl = fetch, log = console.log, signerFac
   async function getSigner(s) {
     const wl = walletOf(store, s);
     if (!wl?.privateKey) throw new Error('no bot wallet yet');
-    if (!signer || signerKey !== wl.privateKey) { signer = await signerFactory(wl.privateKey, s.rpcUrl || PUBLIC_RPC); signerKey = wl.privateKey; }
+    const tag = s.attribution === false ? '' : attributionSuffix(ATTRIBUTION_CODE);
+    if (!signer || signerKey !== wl.privateKey + tag) { signer = await signerFactory(wl.privateKey, s.rpcUrl || PUBLIC_RPC, { tag }); signerKey = wl.privateKey + tag; }
     return signer;
   }
 

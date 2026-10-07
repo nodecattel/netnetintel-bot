@@ -17,6 +17,7 @@
 - **Telegram (@netnetintel_bot)** is how you send those commands. Anyone who controls your Telegram account can do the same.
 - **The setup page** can do everything, so it answers only on this computer (Docker publishes it to 127.0.0.1), refuses requests from other web sites (Host and Origin checks), and needs your password. Withdrawing and showing the recovery words ask for the password again.
 - **The desk approval** is capped at one series budget, not unlimited.
+- **The trade tag** (`netnetintel_bot`, ERC-8021) is public text at the end of the bot's desk transactions. It identifies the bot software, not you, and the desk ignores it. It can be turned off.
 
 ## Recommendations
 

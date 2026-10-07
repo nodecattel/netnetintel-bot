@@ -1,6 +1,6 @@
 {
   "name": "netnetintel-bot",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Self-run NetNet Predict bot: the netnetintel.com model, your own wallet, your limits.",
   "type": "module",

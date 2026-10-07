@@ -134,10 +134,12 @@ function settingsScreen() {
     <div class="card"><h2>Budget and limits</h2>${limitsForm()}<div class="row"><button class="primary" id="saveL">Save</button></div><div class="err" id="eL"></div></div>
     <div class="card"><h2>Telegram</h2>${s.paired ? `<p>Linked. <button id="unpair">Unlink</button></p><p class="muted small">To link another chat, make a new code with /selfhost and paste it below.</p>` : ''}${pairForm()}
       <div class="row"><button class="primary" id="pair">Link</button></div><div class="err" id="eT"></div></div>
-    <div class="card"><h2>Safety checks</h2>
+    <div class="card"><h2>Checks and tagging</h2>
       <label><input type="checkbox" id="ch1" ${s.checks.requireHealth !== false ? 'checked' : ''}> Wait for the site's pre-trade checks (formula, jumps, Safe transfers, parity)</label>
       <label><input type="checkbox" id="ch2" ${s.checks.requireRfvMatch !== false ? 'checked' : ''}> Compare the site's Treasury number with the chain before trading</label>
       <p class="muted small">Recommended on. Turning them off lets the bot trade through the kind of data error that made the site's paper bot lose on 6 Oct.</p>
+      <label><input type="checkbox" id="ch3" ${s.attribution !== false ? 'checked' : ''}> Tag the bot's trades as NetNet Intel (ERC-8021)</label>
+      <p class="muted small">Adds a short public tag (<code>netnetintel_bot</code>) to the end of each desk transaction so the volume self-run bots bring NetNet can be counted on chain. The trade is the same; it costs about 450 gas. Nothing about you or your wallet is in it.</p>
       <div class="row"><button id="saveC">Save checks</button></div><div class="err" id="eC"></div></div>
     <div class="card"><h2>Wallet</h2><p class="mono">${esc(S.wallet?.address || '')}</p>
       ${S.wallet?.fromEnv ? '<p class="muted small">Key supplied by the environment (advanced setup).</p>' : `<label for="pwR">Password</label><input id="pwR" type="password"><div class="row"><button id="reveal">Show recovery words</button></div><div id="rv"></div><div class="err" id="eR"></div>`}</div>`;
@@ -145,7 +147,7 @@ function settingsScreen() {
   document.getElementById('saveL').onclick = async () => { try { await saveLimits(); await load(); flash = 'Saved.'; } catch (e) { err('eL', e); } };
   document.getElementById('pair').onclick = async () => { try { await api('/api/pair', { code: document.getElementById('code').value }); await load(); } catch (e) { err('eT', e); } };
   const un = document.getElementById('unpair'); if (un) un.onclick = async () => { await api('/api/unpair', {}); await load(); };
-  document.getElementById('saveC').onclick = async () => { try { await api('/api/settings', { checks: { requireHealth: document.getElementById('ch1').checked, requireRfvMatch: document.getElementById('ch2').checked } }); await load(); } catch (e) { err('eC', e); } };
+  document.getElementById('saveC').onclick = async () => { try { await api('/api/settings', { checks: { requireHealth: document.getElementById('ch1').checked, requireRfvMatch: document.getElementById('ch2').checked }, attribution: document.getElementById('ch3').checked }); await load(); } catch (e) { err('eC', e); } };
   const rv = document.getElementById('reveal');
   if (rv) rv.onclick = async () => { try { const r = await api('/api/wallet/reveal', { password: document.getElementById('pwR').value }); document.getElementById('rv').innerHTML = r.phrase ? `<div class="phrase">${r.phrase.split(' ').map((x, i) => `<div><b>${i + 1}</b>${esc(x)}</div>`).join('')}</div>` : `<p class="mono">${esc(r.privateKey)}</p>`; } catch (e) { err('eR', e); } };
 }

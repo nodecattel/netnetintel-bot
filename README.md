@@ -51,6 +51,10 @@ Telegram can stop it, resume it, or make it sell. It can't make the bot buy, rai
 
 The bot sends short reports to netnetintel.com, which forwards them to your Telegram chat: fills (side, amount, price, transaction link), alerts, and a status line (mode, series, spend, result). It also checks there about once a minute for your Stop, Resume and Sell-all commands. It never sends the key, the recovery words or your page password. To run without Telegram, skip the pairing step.
 
+## Trade tag
+
+Each desk transaction the bot sends ends with a short public tag, `netnetintel_bot`, in the [ERC-8021](https://docs.dune.com/query-engine/Functions-and-operators/eip-8021.md) format. It lets anyone count the volume and fees self-run bots bring NetNet. The desk ignores it, so the fill is identical, and it costs about 450 gas. It says nothing about you or your wallet. Turn it off in Settings → Checks and tagging, or with `ATTRIBUTION=off`.
+
 ## More
 
 - [ADVANCED.md](ADVANCED.md): Compose, environment settings, your own RPC, using an existing key, building from source.
