@@ -1,0 +1,15 @@
+# Advanced: docker compose up -d   (the setup page is then at http://localhost:8787)
+services:
+  bot:
+    image: ghcr.io/nodecattel/netnetintel-bot:latest
+    # build: .            # or build from this folder
+    container_name: netnetintel-bot
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8787:8787"   # this computer only — don't drop the 127.0.0.1
+    volumes:
+      - netnetintel-bot-data:/data
+    # environment:         # optional overrides, see ADVANCED.md
+    #   MAX_SPEND_PER_SERIES: "200"
+volumes:
+  netnetintel-bot-data:

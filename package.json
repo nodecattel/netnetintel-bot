@@ -1,0 +1,20 @@
+{
+  "name": "netnetintel-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Self-run NetNet Predict bot: the netnetintel.com model, your own wallet, your limits.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/main.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@fontsource/instrument-serif": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "ethers": "6.13.4"
+  }
+}
